@@ -1,0 +1,11 @@
+{
+    "singleQuote": true,
+    "trailingComma": "all",
+    "tabWidth": 2,
+    "semi": true,
+    "bracketSpacing": true,
+    "space-infix-ops": "error",
+    "space-before-function-paren": ["error", "always"], 
+    "keyword-spacing": ["error", { "before": true, "after": true }],
+    "useTabs": false
+}

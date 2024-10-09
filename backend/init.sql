@@ -16,6 +16,12 @@ CREATE TABLE IF NOT EXISTS frequency (
     type VARCHAR(50) NOT NULL UNIQUE
 );
 
+-- Crear tabla 'role'
+CREATE TABLE IF NOT EXISTS role (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
 -- Crear tabla 'user'
 CREATE TABLE IF NOT EXISTS "user" (
     id SERIAL PRIMARY KEY,
@@ -25,12 +31,14 @@ CREATE TABLE IF NOT EXISTS "user" (
     income DECIMAL(10, 2),
     monthly_expenses DECIMAL(10, 2),
     home_id INT,
+    role_id INT, -- Añadir campo 'role_id'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (home_id) REFERENCES home(id)
+    FOREIGN KEY (home_id) REFERENCES home(id),
+    FOREIGN KEY (role_id) REFERENCES role(id) -- Relacionar con la tabla 'role'
 );
 
--- Crear la función del trigger para actualizar 'updated_at'
+-- Crear la función del trigger para actualizar 'updated_at' en 'user'
 CREATE OR REPLACE FUNCTION update_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -92,11 +100,15 @@ ON CONFLICT (name) DO NOTHING;
 INSERT INTO frequency (type) VALUES ('Mensual'), ('Semanal'), ('Anual')
 ON CONFLICT (type) DO NOTHING;
 
+-- Insertar datos de ejemplo en la tabla 'role'
+INSERT INTO role (name) VALUES ('Admin'), ('User'), ('Guest')
+ON CONFLICT (name) DO NOTHING;
+
 -- Insertar datos de ejemplo en la tabla 'user'
-INSERT INTO "user" (name, email, password, income, monthly_expenses, home_id) 
+INSERT INTO "user" (name, email, password, income, monthly_expenses, home_id, role_id) 
 VALUES 
-    ('Juan Pérez', 'juan.perez@example.com', 'contraseñasegura123', 3500.00, 1200.00, 1),
-    ('Ana García', 'ana.garcia@example.com', 'contraseñasegura456', NULL, 500.00, 2)
+    ('Juan Pérez', 'juan.perez@example.com', 'contraseñasegura123', 3500.00, 1200.00, 1, 1),  -- Admin
+    ('Ana García', 'ana.garcia@example.com', 'contraseñasegura456', NULL, 500.00, 2, 2)  -- User
 ON CONFLICT (email) DO NOTHING;
 
 -- Insertar datos de ejemplo en la tabla 'expense'
@@ -107,4 +119,3 @@ VALUES
     ('Alquiler', 'Pago mensual del apartamento', 1, 3, 1, 800.00, TRUE),
     ('Membresía de gimnasio personal', 'Pago mensual del gimnasio', 1, 4, 1, 30.00, FALSE)
 ON CONFLICT (name, user_id) DO NOTHING;
-
